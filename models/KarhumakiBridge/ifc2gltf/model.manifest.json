@@ -1,0 +1,33 @@
+{
+    "inputFile": "./models/KarhumakiBridge/ifc/model.ifc",
+    "converterApplication": "ifc2gltfcxconverter",
+    "converterApplicationVersion": "4.34.4",
+    "conversionDate": "2025-03-17 15:54:27",
+    "gltfOutFiles": [
+        "./models/KarhumakiBridge/ifc2gltf/model.glb",
+        "./models/KarhumakiBridge/ifc2gltf/model_1.glb"
+    ],
+    "metadataOutFiles": [
+        "./models/KarhumakiBridge/ifc2gltf/model.json"
+    ],
+    "numCreatedGltfMeshes": 25393,
+    "numCreatedMetaObjects": 6918,
+    "numExportedPropertySetsOrElementQuantities": 0,
+    "modelBoundsMax": [
+        70.30798589504883,
+        96.14459837852093,
+        32.1282684897125
+    ],
+    "modelBoundsMin": [
+        -70.30798589504883,
+        -96.14459837852093,
+        -32.1282684897125
+    ],
+    "generalMessages": [
+        "Detected IFC version: IFC2X3"
+    ],
+    "warnings": [
+        "no intersection found"
+    ],
+    "errors": []
+}
