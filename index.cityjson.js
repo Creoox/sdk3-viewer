@@ -4,9 +4,9 @@ import * as xeokit from "./xeokit-demo-bundle.js";
 
 import {DemoHelper} from "./DemoHelper.js";
 
-// Create a DotBIMLoader to load .BIM files
+// Create a CityJSONLoader to load CityJSON files
 
-const dotBIMLoader = new xeokit.dotbim.DotBIMLoader();
+const cityJSONLoader = new xeokit.cityjson.CityJSONLoader();
 
 // Create a Scene to hold geometry and materials
 
@@ -45,10 +45,11 @@ view.camera.worldAxis = [
 
 // Arrange the View's Camera within our +Z "up" coordinate system
 
-view.camera.eye = [11.276311451067942, 16.914467176601914, 7.399026975905038];
-view.camera.look = [0, 0, 0];
-view.camera.up = [-0.18971864040782152, -0.28457796061173224, 0.9396926209223285];
+view.camera.eye = [11.50, 16.32, 15.12];
+view.camera.look = [9.01, 9.65, 11.22];
+view.camera.up = [-0.16, -0.45, 0.87];
 
+view.camera.zoom(-15)
 
 // Add a CameraControl to interactively control the View's Camera with keyboard,
 // mouse and touch input
@@ -64,6 +65,8 @@ const sceneModel = scene.createModel({
 // Ignore the DemHelper
 
 const demoHelper = new DemoHelper({
+    viewer,
+    data
 });
 
 demoHelper.init()
@@ -80,36 +83,35 @@ demoHelper.init()
 
         } else {
 
-            // Use the DotBIMLoader to load an IFC model from a .BIM file into our SceneModel and DataModel
+            // Use CityJSONLoader to load an IFC model from a dotbim file into our SceneModel and DataModel
 
-            fetch("../../models/BlenderHouse/dotbim/model.bim").then(response => {
+            fetch("../../models/LoD3_Railway/cityjson/model.json").then(response => {
 
                 response
                     .json()
                     .then(fileData => {
 
-                    dotBIMLoader.load({
-                        fileData,
-                        sceneModel,
-                        dataModel
-                    }).then(() => {
+                        cityJSONLoader.load({
+                            fileData,
+                            sceneModel,
+                            dataModel
+                        }).then(() => {
 
-                        // Build the SceneModel and DataModel.
-                        // The Scene and SceneModel will now contain a SceneObject for each displayable object in our model.
-                        // The Data and DataModel will contain a DataObject for each IFC element in the model. Each SceneObject
-                        // will have a corresponding DataObject with the same ID, to attach semantic meaning.
-                        // The View will contain a ViewObject corresponding to each SceneObject, through which the
-                        // appearance of the object can be controlled in the View.
+                            // Build the SceneModel and DataModel.
+                            // The Scene and SceneModel will now contain a SceneObject for each displayable object in our model.
+                            // The Data and DataModel will contain a DataObject for each IFC element in the model. Each SceneObject
+                            // will have a corresponding DataObject with the same ID, to attach semantic meaning.
+                            // The View will contain a ViewObject corresponding to each SceneObject, through which the
+                            // appearance of the object can be controlled in the View.
 
-                        dataModel.build();
-                        sceneModel.build();
+                            dataModel.build();
+                            sceneModel.build();
 
-                        demoHelper.finished();
-
-                    }).catch(message => {
-                        console.error(`Error loading .BIM: ${message}`);
+                            demoHelper.finished();
+                        }).catch(message => {
+                            console.error(`Error loading CityJSON: ${message}`);
+                        });;
                     });
-                });
             });
         }
     });
