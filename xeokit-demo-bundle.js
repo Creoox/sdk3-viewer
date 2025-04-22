@@ -58885,19 +58885,7 @@ var WebGLRenderBuffer = class {
     const imageData = imageDataCache.imageData;
     const context = imageDataCache.context;
     const { width, height } = this.#buffer;
-    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixelData);
-    imageData.data.set(pixelData);
-    context.putImageData(imageData, 0, 0);
-    context.save();
-    context.globalCompositeOperation = "copy";
-    context.scale(1, -1);
-    context.drawImage(canvas2, 0, -height, width, height);
-    context.restore();
     let format = params2.format || "png";
-    if (format !== "jpeg" && format !== "png" && format !== "bmp") {
-      console.error("Unsupported image format: '" + format + "' - supported types are 'jpeg', 'bmp' and 'png' - defaulting to 'png'");
-      format = "png";
-    }
     return canvas2.toDataURL(`image/${format}`);
   }
   _getImageDataCache(type = Uint8Array, multiplier = 4) {
