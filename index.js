@@ -1,8 +1,30 @@
 // Import the SDK from a bundle built for these examples
 
-import * as xeokit from "./xeokit-demo-bundle.js";
+// import * as xeokit from "https://cdn.jsdelivr.net/npm/@xeokit/sdk@0.1.2-alpha/dist/xeokit-sdk.esm.js";
 
 import {DemoHelper} from "./DemoHelper.js";
+
+const urlParams = new URLSearchParams(window.location.search);
+
+let xeokitModelUrl = urlParams.get('url') ?? 'https://xeokit.github.io/xeokit-sdk/assets/models/dotbim/TestStructure.bim';
+xeokitModelUrl = decodeURIComponent(xeokitModelUrl);
+const xeokitVersion = urlParams.get('xeokit') ?? 'sdk@0.1.2-alpha';
+const xeokitUrl = `https://cdn.jsdelivr.net/npm/@xeokit/${xeokitVersion}/dist/xeokit-sdk.esm.js`;
+const edges = urlParams.get('edges') ? urlParams.get('edges') === '1' || urlParams.get('edges') === 'true' : false;
+
+class ImportError extends Error {}
+
+const loadModule = async (modulePath) => {
+  try {
+    return await import(modulePath)
+  } catch (e) {
+    console.log({e});
+    alert(e.message);
+    throw new ImportError(e.message);
+  }
+}
+
+const xeokit = await loadModule(xeokitUrl);
 
 // Create a DotBIMLoader to load .BIM files
 
@@ -34,6 +56,8 @@ const view = viewer.createView({
     id: "demoView",
     elementId: "demoCanvas"
 });
+const viewIndex = view.viewIndex;
+viewer.renderer.setEdgesEnabled(viewIndex, edges);
 
 // Configure the View's World-space coordinate axis to make the +Z axis "up"
 
@@ -82,7 +106,7 @@ demoHelper.init()
 
             // Use the DotBIMLoader to load an IFC model from a .BIM file into our SceneModel and DataModel
 
-            fetch("../../models/BlenderHouse/dotbim/model.bim").then(response => {
+            fetch(xeokitModelUrl).then(response => {
 
                 response
                     .json()
