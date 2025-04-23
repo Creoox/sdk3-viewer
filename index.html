@@ -21,9 +21,25 @@
             background: white;
             border: 0;
         }
+
+        #modelSelector {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10000000;
+            padding: 8px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
+<div id="modelSelector">
+    <select id="modelDropdown">
+        <option value="duplex">Duplex.ifc</option>
+        <option value="teststructure">TestStructure.bim</option>
+    </select>
+</div>
 <canvas id="demoCanvas"></canvas>
 </body>
 <script type="module" src="./index.js"></script>

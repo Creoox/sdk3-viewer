@@ -6,12 +6,47 @@ import {DemoHelper} from "./DemoHelper.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 
-let xeokitModelUrl = urlParams.get('url') ?? 'https://xeokit.github.io/xeokit-sdk/assets/models/dotbim/TestStructure.bim';
+// Define model configurations
+const models = {
+    duplex: {
+        url: 'https://raw.githubusercontent.com/xeokit/xeokit-sdk/refs/heads/master/assets/models/ifc/Duplex.ifc',
+        fileType: 'ifc'
+    },
+    teststructure: {
+        url: 'https://xeokit.github.io/xeokit-sdk/assets/models/dotbim/TestStructure.bim',
+        fileType: 'bim'
+    }
+};
+
+// Get model parameters from URL or use default
+let modelId = urlParams.get('model') || 'teststructure';
+let xeokitModelUrl = urlParams.get('url') || models[modelId].url;
 xeokitModelUrl = decodeURIComponent(xeokitModelUrl);
 const xeokitVersion = urlParams.get('xeokit') ?? 'sdk@0.1.5-alpha';
 const xeokitUrl = `https://cdn.jsdelivr.net/npm/@xeokit/${xeokitVersion}/dist/xeokit-sdk.esm.js`;
 const edges = urlParams.get('edges') ? urlParams.get('edges') === '1' || urlParams.get('edges') === 'true' : false;
-const fileType = urlParams.get('fileType');
+let fileType = urlParams.get('fileType') || models[modelId].fileType;
+
+// Set the dropdown to match the current model
+document.addEventListener('DOMContentLoaded', () => {
+    const dropdown = document.getElementById('modelDropdown');
+    if (dropdown) {
+        dropdown.value = modelId;
+        
+        // Add change event listener
+        dropdown.addEventListener('change', () => {
+            const selectedModel = dropdown.value;
+            const params = new URLSearchParams();
+            params.set('model', selectedModel);
+            params.set('fileType', models[selectedModel].fileType);
+            params.set('url', models[selectedModel].url);
+            if (edges) {
+                params.set('edges', '1');
+            }
+            window.location.search = params.toString();
+        });
+    }
+});
 
 console.log(fileType);
 class ImportError extends Error {}
