@@ -8,10 +8,12 @@ const urlParams = new URLSearchParams(window.location.search);
 
 let xeokitModelUrl = urlParams.get('url') ?? 'https://xeokit.github.io/xeokit-sdk/assets/models/dotbim/TestStructure.bim';
 xeokitModelUrl = decodeURIComponent(xeokitModelUrl);
-const xeokitVersion = urlParams.get('xeokit') ?? 'sdk@0.1.2-alpha';
+const xeokitVersion = urlParams.get('xeokit') ?? 'sdk@0.1.5-alpha';
 const xeokitUrl = `https://cdn.jsdelivr.net/npm/@xeokit/${xeokitVersion}/dist/xeokit-sdk.esm.js`;
 const edges = urlParams.get('edges') ? urlParams.get('edges') === '1' || urlParams.get('edges') === 'true' : false;
+const fileType = urlParams.get('fileType');
 
+console.log(fileType);
 class ImportError extends Error {}
 
 const loadModule = async (modulePath) => {
@@ -29,6 +31,10 @@ const xeokit = await loadModule(xeokitUrl);
 // Create a DotBIMLoader to load .BIM files
 
 const dotBIMLoader = new xeokit.dotbim.DotBIMLoader();
+
+// Create an IFCLoader to load .ifc files
+
+const ifcLoader = new xeokit.ifc.IFCLoader();
 
 // Create a Scene to hold geometry and materials
 
@@ -56,22 +62,27 @@ const view = viewer.createView({
     id: "demoView",
     elementId: "demoCanvas"
 });
+
+const cameraFlight = new xeokit.cameraflight.CameraFlightAnimation(view);
+scene.onModelCreated.subscribe(() => {
+    cameraFlight.jumpTo({aabb: scene.aabb});
+});
 const viewIndex = view.viewIndex;
 viewer.renderer.setEdgesEnabled(viewIndex, edges);
 
 // Configure the View's World-space coordinate axis to make the +Z axis "up"
 
-view.camera.worldAxis = [
-    1, 0, 0, // Right +X
-    0, 0, 1, // Up +Z
-    0, -1, 0  // Forward -Y
-];
+// view.camera.worldAxis = [
+//     1, 0, 0, // Right +X
+//     0, 0, 1, // Up +Z
+//     0, -1, 0  // Forward -Y
+// ];
 
 // Arrange the View's Camera within our +Z "up" coordinate system
 
-view.camera.eye = [11.276311451067942, 16.914467176601914, 7.399026975905038];
+view.camera.eye = [100, 16.914467176601914, 7.399026975905038];
 view.camera.look = [0, 0, 0];
-view.camera.up = [-0.18971864040782152, -0.28457796061173224, 0.9396926209223285];
+view.camera.up = fileType === "ifc" ? [0,1,0] : [0,0,1];
 
 
 // Add a CameraControl to interactively control the View's Camera with keyboard,
@@ -85,6 +96,7 @@ const sceneModel = scene.createModel({
     id: "demoModel"
 });
 
+const loader = fileType === "bim" ? dotBIMLoader : ifcLoader;
 // Ignore the DemHelper
 
 const demoHelper = new DemoHelper({
@@ -107,12 +119,15 @@ demoHelper.init()
             // Use the DotBIMLoader to load an IFC model from a .BIM file into our SceneModel and DataModel
 
             fetch(xeokitModelUrl).then(response => {
-
+                if (fileType === "bim") {
+                    response = response.json();
+                } else {
+                    response = response.arrayBuffer();
+                }
                 response
-                    .json()
                     .then(fileData => {
 
-                    dotBIMLoader.load({
+                    loader.load({
                         fileData,
                         sceneModel,
                         dataModel
